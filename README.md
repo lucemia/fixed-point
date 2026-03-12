@@ -32,6 +32,48 @@ def test_search(fixedpoint):
 
 The first time you run with `--fixedpoint=record_once`, it captures real outputs. Every subsequent run replays them — no network calls, no flakiness.
 
+## Async Support
+
+`@recordable` works with `async` functions and methods out of the box — no extra setup needed:
+
+```python
+from fixedpoint import recordable
+
+@recordable
+async def fetch_user(user_id):
+    return await external_service.get_user(user_id)
+
+@recordable
+async def search(query):
+    return await external_service.search(query)
+
+async def test_fetch_user(fixedpoint):
+    user = await fetch_user(42)
+    assert user["name"] == "Alice"
+```
+
+It also works with async methods on classes:
+
+```python
+from fixedpoint import recordable
+
+class UserClient:
+    @recordable
+    async def get_user(self, user_id):
+        return await self._session.get(f"/users/{user_id}")
+
+    @recordable
+    async def list_users(self):
+        return await self._session.get("/users")
+
+async def test_user_client(fixedpoint):
+    client = UserClient()
+    user = await client.get_user(42)
+    assert user["name"] == "Alice"
+```
+
+The decorator detects whether the function is a coroutine and wraps it accordingly. Recording and replay work identically — the cassette format is the same for sync and async functions.
+
 ## Modes
 
 Fixed-Point supports 4 operational modes via the `--fixedpoint` CLI option:
