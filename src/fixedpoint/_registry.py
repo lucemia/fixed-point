@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import functools
 import warnings
-from typing import Any, Callable, TypeVar
+from collections.abc import Callable
+from typing import Any, TypeVar
 
 _REGISTRY: dict[str, Callable] = {}
 _active_interceptor: Any = None

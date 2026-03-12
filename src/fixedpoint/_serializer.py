@@ -51,8 +51,7 @@ def deserialize_value(data: Any) -> Any:
             mod = importlib.import_module(module_name)
             cls = getattr(mod, class_name)
             fields = {
-                f.name: deserialize_value(data[f.name])
-                for f in dataclasses.fields(cls)
+                f.name: deserialize_value(data[f.name]) for f in dataclasses.fields(cls)
             }
             return cls(**fields)
         return {k: deserialize_value(v) for k, v in data.items()}

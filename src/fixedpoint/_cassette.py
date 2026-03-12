@@ -55,9 +55,7 @@ class Cassette:
         self._data.calls.setdefault(func_key, []).append(record)
         self._dirty = True
 
-    def replay_call(
-        self, func_key: str, args: tuple, kwargs: dict
-    ) -> Any:
+    def replay_call(self, func_key: str, args: tuple, kwargs: dict) -> Any:
         calls = self._data.calls.get(func_key)
         if not calls:
             _raise_mismatch(f"No recorded calls for {func_key}")
@@ -98,9 +96,7 @@ class Cassette:
                 for key, records in self._data.calls.items()
             },
         }
-        self._path.write_text(
-            yaml.dump(raw, default_flow_style=False, sort_keys=False)
-        )
+        self._path.write_text(yaml.dump(raw, default_flow_style=False, sort_keys=False))
 
 
 def _raise_mismatch(msg: str) -> None:

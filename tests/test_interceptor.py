@@ -1,7 +1,5 @@
 from fixedpoint._cassette import Cassette
 from fixedpoint._interceptor import Interceptor
-from fixedpoint._registry import _active_interceptor
-
 from tests.sample_app import math_funcs
 
 

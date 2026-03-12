@@ -115,7 +115,5 @@ class TestCassette:
         c.save()
 
         loaded = Cassette.load(path)
-        result = loaded.replay_call(
-            "mod.func", ([1, 2], {"key": "val"}), {"opt": True}
-        )
+        result = loaded.replay_call("mod.func", ([1, 2], {"key": "val"}), {"opt": True})
         assert result == {"result": [1, 2, 3]}

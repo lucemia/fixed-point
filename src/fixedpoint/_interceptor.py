@@ -17,9 +17,7 @@ class Interceptor:
     def uninstall(self) -> None:
         set_active_interceptor(None)
 
-    def intercept(
-        self, key: str, original: Any, args: tuple, kwargs: dict
-    ) -> Any:
+    def intercept(self, key: str, original: Any, args: tuple, kwargs: dict) -> Any:
         mode = self._mode
         cassette = self._cassette
 

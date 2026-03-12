@@ -5,5 +5,4 @@ dist/
 build/
 .venv/
 .pytest_cache/
-*.yaml
-!pyproject.toml
+cassettes/
