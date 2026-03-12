@@ -29,7 +29,7 @@ def serialize_value(value: Any) -> Any:
             if not isinstance(k, str):
                 _raise(f"Dict keys must be strings, got {type(k).__name__}")
         return {k: serialize_value(v) for k, v in value.items()}
-    
+
     # Check for Pydantic BaseModel (optional dependency)
     try:
         from pydantic import BaseModel
@@ -41,7 +41,7 @@ def serialize_value(value: Any) -> Any:
             }
     except ImportError:
         pass
-    
+
     if dataclasses.is_dataclass(value) and not isinstance(value, type):
         cls = type(value)
         data: dict[str, Any] = {

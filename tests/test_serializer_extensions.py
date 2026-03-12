@@ -2,9 +2,6 @@
 from __future__ import annotations
 
 import enum
-from typing import Optional
-
-import pytest
 
 from fixedpoint._serializer import deserialize_value, serialize_value
 
@@ -79,7 +76,7 @@ try:
         """Test Pydantic model."""
         name: str
         age: int
-        email: Optional[str] = None
+        email: str | None = None
 
     class MediaFile(BaseModel):
         """Test Pydantic model with enum."""
@@ -91,7 +88,7 @@ try:
         """Test Pydantic model serialization."""
         person = Person(name="Alice", age=30, email="alice@example.com")
         result = serialize_value(person)
-        
+
         assert result["__pydantic__"].endswith(".Person")
         assert result["data"] == {
             "name": "Alice",
@@ -105,7 +102,7 @@ try:
         person = Person(name="Bob", age=25, email=None)
         serialized = serialize_value(person)
         result = deserialize_value(serialized)
-        
+
         assert isinstance(result, Person)
         assert result.name == "Bob"
         assert result.age == 25
@@ -115,7 +112,7 @@ try:
         """Test Pydantic model with enum field."""
         media = MediaFile(type=Color.RED, title="Test Video", size=1024)
         serialized = serialize_value(media)
-        
+
         # The enum should be serialized as a string by model_dump(mode='json')
         assert serialized["__pydantic__"].endswith(".MediaFile")
         assert serialized["data"] == {
@@ -123,7 +120,7 @@ try:
             "title": "Test Video",
             "size": 1024,
         }
-        
+
         deserialized = deserialize_value(serialized)
         assert isinstance(deserialized, MediaFile)
         assert deserialized.type == Color.RED
@@ -134,10 +131,10 @@ try:
         """Test Pydantic model inside tuple."""
         person = Person(name="Charlie", age=35)
         original = (person, "metadata", 123)
-        
+
         serialized = serialize_value(original)
         deserialized = deserialize_value(serialized)
-        
+
         assert isinstance(deserialized, tuple)
         assert len(deserialized) == 3
         assert isinstance(deserialized[0], Person)
@@ -150,9 +147,9 @@ try:
         original = MediaFile(type=Color.BLUE, title="Document", size=2048)
         serialized = serialize_value(original)
         deserialized = deserialize_value(serialized)
-        
+
         assert deserialized == original
-        assert type(deserialized) == type(original)
+        assert isinstance(deserialized, type(original))
         assert deserialized.type == original.type
 
 except ImportError:
