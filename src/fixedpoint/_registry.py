@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import functools
 import warnings
 from collections.abc import Callable
@@ -19,6 +20,21 @@ def recordable(fn: F) -> F:
             "Cassettes may break if the enclosing function is renamed.",
             stacklevel=2,
         )
+
+    if asyncio.iscoroutinefunction(fn):
+
+        @functools.wraps(fn)
+        async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
+            interceptor = _active_interceptor
+            if interceptor is not None:
+                return await interceptor.async_intercept(key, fn, args, kwargs)
+            return await fn(*args, **kwargs)
+
+        async_wrapper.__wrapped__ = fn  # type: ignore[attr-defined]
+        async_wrapper.__fixedpoint_recordable__ = True  # type: ignore[attr-defined]
+        async_wrapper.__fixedpoint_key__ = key  # type: ignore[attr-defined]
+        _REGISTRY[key] = fn
+        return async_wrapper  # type: ignore[return-value]
 
     @functools.wraps(fn)
     def wrapper(*args: Any, **kwargs: Any) -> Any:

@@ -1,3 +1,4 @@
+import asyncio
 import warnings
 
 from fixedpoint._registry import clear_registry, get_registry, recordable
@@ -52,3 +53,45 @@ class TestRecordable:
             return inner
 
         make_func()
+
+
+class TestRecordableAsync:
+    def setup_method(self):
+        clear_registry()
+
+    def test_registers_async_function(self):
+        @recordable
+        async def my_func(x):
+            return x
+
+        reg = get_registry()
+        assert my_func.__fixedpoint_key__ in reg
+
+    def test_wraps_async_function(self):
+        async def original(x):
+            return x
+
+        decorated = recordable(original)
+        assert decorated.__wrapped__ is original
+        assert decorated.__name__ == "original"
+
+    def test_sets_sentinel_attribute(self):
+        @recordable
+        async def my_func():
+            pass
+
+        assert my_func.__fixedpoint_recordable__ is True
+
+    def test_async_function_still_works(self):
+        @recordable
+        async def add(a, b):
+            return a + b
+
+        assert asyncio.run(add(2, 3)) == 5
+
+    def test_decorated_is_coroutine_function(self):
+        @recordable
+        async def my_func():
+            pass
+
+        assert asyncio.iscoroutinefunction(my_func)

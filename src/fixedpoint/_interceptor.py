@@ -35,3 +35,24 @@ class Interceptor:
                 f"  Hint: Run with --fixedpoint=record_once to create it."
             )
         return original(*args, **kwargs)
+
+    async def async_intercept(
+        self, key: str, original: Any, args: tuple, kwargs: dict
+    ) -> Any:
+        mode = self._mode
+        cassette = self._cassette
+
+        if mode in ("replay", "record_once") and cassette.has_calls(key):
+            return cassette.replay_call(key, args, kwargs)
+        if mode in ("record_once", "rewrite"):
+            result = await original(*args, **kwargs)
+            cassette.record_call(key, args, kwargs, result)
+            return result
+        if mode == "replay":
+            from fixedpoint import CassetteNotFoundError
+
+            raise CassetteNotFoundError(
+                f"No cassette entry for {key} and mode is 'replay'.\n"
+                f"  Hint: Run with --fixedpoint=record_once to create it."
+            )
+        return await original(*args, **kwargs)
