@@ -11,7 +11,7 @@
 You can install pytest-fixedpoint using pip, the Python package manager:
 
 ```
-pip install pytest-fixedpoint
+pip install fixed-point-recorder
 ```
 
 ## Getting Started
